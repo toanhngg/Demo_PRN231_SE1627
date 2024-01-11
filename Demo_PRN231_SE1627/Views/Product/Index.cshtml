@@ -1,0 +1,170 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@model List<Demo_PRN231_SE1627.Models.Product> 
+
+<table border="1">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>ProductName</th>
+            <th>UnitPrice</th>
+            <th>UnitsInStock</th>
+            <th>Image</th>
+            <th>CategoryName</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var product in ViewBag.Products)
+        {
+         
+            <tr class="row-clickable" id="product-@product.ProductId" data-category-id="@product.Category.CategoryId">
+                <td>@product.ProductId</td>
+                <td>@product.ProductName</td>
+                <td>@product.UnitPrice</td>
+                <td>@product.UnitsInStock</td>
+                <td>
+                    <img src="/images/@product.Image" alt="@product.Image"
+                         style="max-width: 100px; max-height: 100px;" />
+                </td>
+                <td>
+                    @if (product.Category != null)
+                    {
+                        @product.Category.CategoryName
+                    }
+                    else
+                    {
+                        <text>No category</text>
+                    }
+                </td>
+                <td>
+                    <button onclick="deleteProduct(@product.ProductId)">Delete</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+
+</table>
+<
+<form method="post" id="productForm">
+    <div>
+        <label for="code">Code:</label>
+        <input type="text" id="code" name="code" required readonly>
+    </div>
+
+    <div>
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+    </div>
+    <div>
+        <label for="stock">Stock:</label>
+        <input type="number" id="stock" name="stock" required>
+    </div>
+    <div>
+        <label for="price">Price:</label>
+        <input type="text" id="price" name="price" required>
+    </div>
+    <div>
+        <label for="image">Image URL:</label>
+        <input type="text" id="image" name="image" required>
+    </div>
+    <div>
+        <label for="category">Category:</label>
+        <select name="category" id="categorySelect">
+            <option value="">-- Select Category --</option>
+            @foreach (var category in ViewBag.Categories)
+            {
+                <option value="@category.CategoryId">@category.CategoryName</option>
+            }
+        </select>
+
+
+    </div>
+    <div>
+        <button type="button" onclick="submitForm('add')">Add product</button>
+        <button type="button" onclick="submitForm('update')">Update product</button>
+    </div>
+</form>
+
+    <script>
+        function submitForm(action) {
+            var form = document.getElementById('productForm');
+            var actionUrl = '';
+
+            if (action === 'add') {
+                actionUrl = 'Product/Create'; // Action thêm mới
+            } else if (action === 'update') {
+            actionUrl = 'Product/Update/' +document.getElementById('code').value;
+            }
+
+            $.ajax({
+                type: 'POST',
+                url: actionUrl, // Sử dụng actionUrl tương ứng với action
+                data: $(form).serialize(), // Gửi dữ liệu từ form
+                success: function (response) {
+                    // Nếu cập nhật thành công, làm mới trang
+                    window.location.reload();
+                },
+                error: function () {
+                    alert('Failed to update product.');
+                }
+            });
+        }
+    </script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+
+
+    $(document).ready(function () {
+        $('.row-clickable').click(function () {
+            var categoryId = $(this).data('category-id');
+            var categoryName = $(this).find('td:nth-child(6)').text().trim();
+
+
+            var code = $(this).find('td:nth-child(1)').text(); // Thay 1 bằng vị trí cột tương ứng
+            var name = $(this).find('td:nth-child(2)').text();
+            var stock = $(this).find('td:nth-child(3)').text();
+            var price = $(this).find('td:nth-child(4)').text();
+            var image = $(this).find('td:nth-child(5)').text();
+            var categoryName = $(this).find('td:nth-child(6)').text();
+
+            // Gán dữ liệu vào các trường form
+            $('#code').val(code);
+            $('#name').val(name);
+            $('#stock').val(stock);
+            $('#price').val(price);
+            $('#image').val(image);
+            $('#categorySelect').val(categoryId);
+
+            // Tương tự cho các trường khác
+        });
+
+        $('#editForm').submit(function (e) {
+            e.preventDefault();
+            // Xử lý logic để lưu dữ liệu từ form vào cơ sở dữ liệu
+            // Sử dụng AJAX hoặc gửi form thông qua phương thức POST
+        });
+    });
+</script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    function deleteProduct(productId) {
+        if (confirm('Are you sure you want to delete this product?')) {
+            $.ajax({
+                type: 'POST', // Hoặc có thể sử dụng 'DELETE'
+                url: '/Product/Delete/' + productId, // Điều này phụ thuộc vào đường dẫn xóa sản phẩm của bạn
+                success: function () {
+                    $('#product-' + productId).remove(); // hoặc sử dụng .remove() nếu phù hợp
+                    alert('Product deleted successfully!');
+                },
+                error: function () {
+                    alert('Failed to delete product.');
+                }
+            });
+        }
+    }
+</script>
