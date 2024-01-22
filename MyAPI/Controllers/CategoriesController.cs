@@ -20,8 +20,8 @@ namespace MyAPI.Controllers
         [HttpGet("getbyId")]
         public IActionResult getAllCategoryById(int categoryId)
         {
-            var data = context.Categories.FirstOrDefault(x => x.CategoryId == categoryId);
-            if(data == null)
+            var data = context.Categories.Where(x => x.CategoryId == categoryId);
+            if (data == null)
             {
                 return NotFound();
             }
@@ -31,34 +31,55 @@ namespace MyAPI.Controllers
             }
         }
         // Insert
+        //C1
+        //[HttpPost("insert")]
+        //public IActionResult InsertCategory(string CategoryName)
+        //{
+        //    //var data = context.Categories.Where(x => x.CategoryId == CategoryId);
+        //    //if (data == null)
+        //    //{
+        //        Category category = new Category()
+        //        {
+        //            CategoryName = CategoryName
+        //        };
+        //        context.Categories.Add(category);
+        //        context.SaveChanges();
+        //        var listcategory = context.Categories.ToList();
+        //        return Ok(listcategory);
+        //    //}
+        //    //else
+        //    //{
+        //    //    return BadRequest();
+        //    //}
+        //}
         [HttpPost("insert")]
-        public IActionResult InsertCategory(int CategoryId , string CategoryName)
+        public IActionResult InsertCategory([FromBody] string CategoryName)
         {
-            var data = context.Categories.FirstOrDefault(x => x.CategoryId == CategoryId);
-            if(data == null)
+            //var data = context.Categories.Where(x => x.CategoryId == CategoryId);
+            //if (data == null)
+            //{
+            Category category = new Category()
             {
-                Category category = new Category()
-                {
-                    CategoryName = CategoryName
-                };
-                context.Categories.Add(category);
-                context.SaveChanges();
-                var listcategory = context.Categories.ToList();
-                return Ok(listcategory);
-            }
-            else
-            {
-                return BadRequest();
-            }
+                CategoryName = CategoryName
+            };
+            context.Categories.Add(category);
+            context.SaveChanges();
+            var listcategory = context.Categories.ToList();
+            return Ok(listcategory);
+            //}
+            //else
+            //{
+            //    return BadRequest();
+            //}
         }
         // Update
         [HttpPut("update")]
-        public IActionResult UpdateCategory(int CategoryId, string CategoryName)
+        public IActionResult UpdateCategory(Category c)
         {
-            var data = context.Categories.FirstOrDefault(x => x.CategoryId == CategoryId);
+            var data = context.Categories.FirstOrDefault(x => x.CategoryId == c.CategoryId);
             if (data != null)
             {
-              data.CategoryName = CategoryName;
+              data.CategoryName = c.CategoryName;
                 context.Categories.Update(data);
                 context.SaveChanges();
                 var listcategory = context.Categories.ToList();
@@ -70,6 +91,24 @@ namespace MyAPI.Controllers
                 return BadRequest();
             }
         }
+        //[HttpPut("update")]
+        //public IActionResult UpdateCategory(int CategoryId, string CategoryName)
+        //{
+        //    var data = context.Categories.FirstOrDefault(x => x.CategoryId == CategoryId);
+        //    if (data != null)
+        //    {
+        //        data.CategoryName = CategoryName;
+        //        context.Categories.Update(data);
+        //        context.SaveChanges();
+        //        var listcategory = context.Categories.ToList();
+
+        //        return Ok(listcategory);
+        //    }
+        //    else
+        //    {
+        //        return BadRequest();
+        //    }
+        //}
         // Delete
         [HttpDelete("delete")]
         public IActionResult DeleteCategory(int categoryId)
